@@ -1,0 +1,254 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+In this chunk we are calling the different libraries used in the wrangling, analysis and modeling of the information
+```{r calling libaries}
+
+library(ggpubr)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(data.table)
+library(caret)
+library(ggcorrplot)
+```
+
+In this chunk we are creating the dataset to work and adding the format to the columns
+```{r Creating the dataset}
+student <- read_csv("student.csv")
+cols(
+  .default = col_character(),
+  X1 = col_double(),
+  age = col_double(),
+  Medu = col_double(),
+  Fedu = col_double(),
+  traveltime = col_double(),
+  studytime = col_double(),
+  failures = col_double(),
+  famrel = col_double(),
+  freetime = col_double(),
+  goout = col_double(),
+  Dalc = col_double(),
+  Walc = col_double(),
+  health = col_double(),
+  absences = col_double(),
+  G1 = col_double(),
+  G2 = col_double(),
+  G3 = col_double()
+)
+
+student$X1 <- NULL
+```
+
+```{r Data basic analysis}
+
+
+#Demography variables
+ggplot(student)+
+  geom_bar(mapping=aes(x=sex, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=age, fill = class))
+
+#Family situation variables
+
+ggplot(student)+
+  geom_bar(mapping=aes(x=address, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=famsize, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=Pstatus, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=guardian, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=Medu, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=Fedu, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=famrel, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=internet, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=famsup, fill = class))
+
+#Free time variables
+
+ggplot(student)+
+  geom_bar(mapping=aes(x=studytime, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=paid, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=activities, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=romantic, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=freetime, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=goout, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=Dalc, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=Walc, fill = class))
+
+#Other Variables
+ggplot(student)+
+  geom_bar(mapping=aes(x=school, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=reason, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=higher, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=health, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=absences, fill = class))
+#Grades variables
+ggplot(student)+
+  geom_bar(mapping=aes(x=G1, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=G2, fill = class))
+ggplot(student)+
+  geom_bar(mapping=aes(x=G3, fill = class))
+
+
+```
+
+Comparing the variables against G3, the final result of the class
+```{r comparing G3}
+#Demography variables
+ggboxplot(student, x = "sex", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "age", y = "G3",
+                 color = "class", palette = "Dark2")
+
+#Family situation variables
+ggboxplot(student, x = "address", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "famsize", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "Pstatus", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "guardian", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "Medu", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "Fedu", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "famrel", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "internet", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "famsup", y = "G3",
+                 color = "class", palette = "Dark2")
+
+#Freetime variables
+ggboxplot(student, x = "studytime", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "paid", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "activities", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "romantic", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "freetime", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "goout", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "Dalc", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "Walc", y = "G3",
+                 color = "class", palette = "Dark2")
+
+#Other variables
+
+ggboxplot(student, x = "school", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "reason", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "higher", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "health", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "absences", y = "G3",
+                 color = "class", palette = "Dark2")
+
+#Grades variables
+ggboxplot(student, x = "G1", y = "G3",
+                 color = "class", palette = "Dark2")
+ggboxplot(student, x = "G2", y = "G3",
+                 color = "class", palette = "Dark2")
+
+```
+
+
+
+In this chunk we create new columns for the cualitative variables to make the 
+```{r Putting the cualitative variables in cuantitative values}
+#Seleting the columns to change
+subset_data <- student %>% select(10:13)
+#Replacing the values in new columns for 1 and 0
+dmy <- dummyVars(" ~ .", data = subset_data)
+trsf <- data.frame(predict(dmy, newdata = subset_data))
+print(trsf)
+
+#Deleting the old columns
+student_num <- select(student, -c(10:13))
+
+#Adding the new columns
+student_num <- cbind.data.frame(student_num, trsf)
+
+#Changing the cualitative values to quantitative
+student$school <- if_else(student$school=="GP",1,0)
+student$sex <- if_else(student$sex=="F",1,0)
+student$address <- if_else(student$address=="U",1,0)
+student$famsize <- if_else(student$famsize=="LE3",1,0)
+student$Pstatus <- if_else(student$Pstatus=="T",1,0)
+student$romantic <- if_else(student$romantic=="yes",1,0)
+student$internet <- if_else(student$internet=="yes",1,0)
+student$higher <- if_else(student$higher=="yes",1,0)
+student$nursery <- if_else(student$nursery=="yes",1,0)
+student$activities <- if_else(student$activities=="yes",1,0)
+student$paid <- if_else(student$paid=="yes",1,0)
+student$famsup <- if_else(student$famsup=="yes",1,0)
+student$schoolsup <- if_else(student$schoolsup=="yes",1,0)
+student$class <- if_else(student$class=="p",1,0)
+```
+
+```{R Scatterplot}
+ggplot(student, aes(higher, G3))+
+  geom_jitter()
+  
+```
+
+```{r general linear regression}
+set.seed(777)
+trainIndex <- createDataPartition(student$G3, p = .7, 
+                                  list = FALSE, 
+                                  times = 1)
+grid = 10 ^ seq(10, -2, length= 100)
+train <- student[trainIndex,]
+test <- student[-trainIndex,]
+
+glm <- train(G3 ~ . ,train,
+               method = "glmnet",
+               trControl = trainControl(
+                 method = 'cv', number = 10,
+                 verboseIter = TRUE
+                 ),
+               preProc = c("center","scale"),
+               tuneGrid = expand.grid(alpha = 1,
+                                      lambda = grid)
+               )
+
+predictions <- predict(glm, test, interval = "confidence")
+```
+
+```{r simple linear regression}
+model <- lm(G3 ~ ., data=train)
+model1 <- lm(x=, data=train)
+predictions <- model %>% predict(test)
+anova(model)
+AIC(model1)
+```

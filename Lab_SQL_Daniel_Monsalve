@@ -1,0 +1,255 @@
+Part 1:
+
+CREATE TABLE BOAT_REGISTRY(
+CUST_ID NUMBER(10),
+L_NAME VARCHAR2(10),
+F_NAME VARCHAR2(10),
+ADDRESS VARCHAR2(20),
+ZIP NUMBER(5),
+EMAIL VARCHAR2(20),
+BALANCE NUMBER(10,2),
+BOAT_ID VARCHAR2(7),
+CONSTRAINT BOAT_REGISTRY_PK PRIMARY KEY(CUST_ID),
+CONSTRAINT BOAT_REGISTRY_CC CHECK(BALANCE >= 0)
+);
+INSERT INTO BOAT_REGISTRY VALUES(0,'Bach','David','2039 76th St.',10001,'david@davidbach.com',1250.00,'WN123AB');
+INSERT INTO BOAT_REGISTRY VALUES(1,'Ramsey','Dave','8391 Main St.',37212,'daveramsey.com',99.99,'WN234CD');
+
+CUST_ID L_NAME     F_NAME     ADDRESS                     ZIP EMAIL                   BALANCE BOAT_ID
+---------- ---------- ---------- -------------------- ---------- -------------------- ---------- -------
+         0 Bach       David      2039 76th St.             10001 david@davidbach.com        1250 WN123AB
+         1 Ramsey     Dave       8391 Main St.             37212 daveramsey.com            99.99 WN234CD
+
+Part 2:
+-- 1 --
+SELECT DISTINCT YEAR FROM BOATS;
+
+
+      YEAR
+----------
+      1997
+      1999
+      1977
+      1962
+      1957
+      1996
+	
+-- 2 --
+
+SELECT * FROM BOATS WHERE REG_NUM = 'WN123AB';
+
+REG_NUM       YEAR MAKE           LENGTH       BEAM
+------- ---------- ---------- ---------- ----------
+WN123AB       1977 Hunter             25         96
+
+
+-- 3 --
+
+SELECT * FROM BOATS WHERE REG_NUM LIKE '%23%';
+
+REG_NUM       YEAR MAKE           LENGTH       BEAM
+------- ---------- ---------- ---------- ----------
+WN123AB       1977 Hunter             25         96
+WN234CD       1999 Calabria           23        103
+WN234EF       1962 Del Mar            16         72
+
+-- 4 -- 
+
+SELECT * FROM BOATS WHERE YEAR <1978 OR LENGTH >20;
+
+REG_NUM       YEAR MAKE           LENGTH       BEAM
+------- ---------- ---------- ---------- ----------
+WN123AB       1977 Hunter             25         96
+WN234CD       1999 Calabria           23        103
+WN234EF       1962 Del Mar            16         72
+WN456GH       1957 Harvey           13.5         70
+WN678JL       1996 Bayliner           47        179
+
+-- 5 --
+
+SELECT * FROM ENGINE_TYPES WHERE HP<100;
+
+MAKE         MODEL                HP FUEL
+------------ ------------ ---------- ------
+Clinton      K990                9.9 Gas
+Mercury      Mark30               30 Gas
+Tohatsu      M50CEPTS             50 Gas
+Rotax        720CC                85 Gas
+
+-- 6 -- 
+
+SELECT * FROM ENGINE_TYPES WHERE HP>100 AND FUEL = 'Gas';
+
+MAKE         MODEL                HP FUEL
+------------ ------------ ---------- ------
+Mercruiser   350MagMPI           300 Gas
+
+-- 7 --
+
+SELECT COUNT FROM ENGINE_TYPES WHERE FUEL= 'Gas';
+
+  COUNT
+----------
+         5
+		 
+-- 8 --
+
+SELECT COUNT FROM ENGINE_TYPES WHERE HP>70 AND FUEL = 'Gas';
+
+  COUNT
+----------
+         2
+		 
+-- 9 --
+
+SELECT AVG(HP) FROM ENGINE_TYPES WHERE FUEL = 'Gas';
+
+   AVG(HP)
+----------
+     94.98
+	 
+	 
+-- 10 --
+
+SELECT AVG(LENGTH) FROM BOATS;
+
+AVG(LENGTH)
+-----------
+      22.25
+	  
+	  
+--  11 --
+
+SELECT COUNT(*) FROM BOATS WHERE YEAR >1900 AND YEAR<2000;
+
+  COUNT(*)
+----------
+         6
+		 
+-- 12 -- 
+
+SELECT a.SERIAL_NUM, b.HP
+FROM ENGINES a
+JOIN ENGINE_TYPES b ON a.MODEL = b.MODEL;
+
+SERIAL_         HP
+------- ----------
+C1075          9.9
+M30099         300
+M3060           30
+T5090           50
+R8596           85
+H31096A        310
+H31096B        310
+
+-- 13 -- 
+
+SELECT a.SERIAL_NUM, b.FUEL
+FROM ENGINES a
+JOIN ENGINE_TYPES b ON a.MODEL = b.MODEL
+WHERE FUEL= 'Gas';
+
+SERIAL_ FUEL
+------- ------
+C1075   Gas
+M30099  Gas
+M3060   Gas
+T5090   Gas
+R8596   Gas
+
+-- 14 -- 
+
+SELECT  a.REG_NUM, SUM(d.HP)
+FROM BOATS a 
+JOIN BOAT_ENGINES b ON a.REG_NUM = b.BOAT_ID
+JOIN ENGINES c ON b.ENGINE_SERIAL_NUM = c.SERIAL_NUM
+JOIN ENGINE_TYPES d ON c.MODEL = d.MODEL
+GROUP BY a.REG_NUM, d.HP
+HAVING SUM(d.HP)>100;
+
+REG_NUM  SUM(D.HP)
+------- ----------
+WN234CD        300
+WN678JL        620
+
+-- 15 -- 
+SELECT ta.*, tb.HP FROM 
+(SELECT REG_NUM, LENGTH, YEAR FROM BOATS a WHERE YEAR>1990 AND LENGTH>20) ta
+JOIN (
+SELECT DISTINCT a.REG_NUM, d.HP HP
+FROM BOATS a 
+JOIN BOAT_ENGINES b ON a.REG_NUM = b.BOAT_ID
+JOIN ENGINES c ON b.ENGINE_SERIAL_NUM = c.SERIAL_NUM
+JOIN ENGINE_TYPES d ON c.MODEL = d.MODEL
+WHERE d.HP >= 300) tb 
+ON ta.REG_NUM = tb.REG_NUM;
+
+REG_NUM     LENGTH       YEAR         HP
+------- ---------- ---------- ----------
+WN678JL         47       1996        310
+WN234CD         23       1999        300
+
+-- 16 -- 
+
+SELECT a.* FROM 
+(SELECT * FROM BOATS WHERE LENGTH > (SELECT AVG(LENGTH) FROM BOATS)) a 
+JOIN
+(SELECT * FROM BOATS WHERE YEAR <1978) b 
+ON a.REG_NUM = b.REG_NUM;
+
+REG_NUM       YEAR MAKE           LENGTH       BEAM
+------- ---------- ---------- ---------- ----------
+WN123AB       1977 Hunter             25         96
+
+-- 17 -- 
+
+SELECT MAKE, MODEL FROM ENGINE_TYPES WHERE FUEL ='Gas'
+UNION
+SELECT MAKE, MODEL FROM ENGINES WHERE YEAR < 1989;
+
+MAKE         MODEL
+------------ ------------
+Clinton      K990
+Mercruiser   350MagMPI
+Mercury      Mark30
+Rotax        720CC
+Tohatsu      M50CEPTS
+
+-- 18 --
+
+UPDATE ENGINE_TYPES SET FUEL = 'Petrol' WHERE FUEL = 'Gas';
+
+5 rows updated.
+
+-- 19 --
+
+DELETE FROM BOAT_ENGINES WHERE BOAT_ID = 'WN123AB';
+DELETE FROM BOATS WHERE REG_NUM = 'WN123AB';
+
+SQL> DELETE FROM BOAT_ENGINES WHERE BOAT_ID = 'WN123AB';
+
+1 row deleted.
+
+SQL> DELETE FROM BOATS WHERE REG_NUM = 'WN123AB';
+
+1 row deleted.
+
+-- 20 -- 
+
+CREATE VIEW ONLY_PETROL AS (SELECT * FROM ENGINE_TYPES WHERE FUEL = 'Petrol');
+
+SQL> CREATE VIEW ONLY_PETROL AS (SELECT * FROM ENGINE_TYPES WHERE FUEL = 'Petrol');
+
+View created.
+
+SELECT * FROM ONLY_PETROL
+
+MAKE         MODEL                HP FUEL
+------------ ------------ ---------- ------
+Clinton      K990                9.9 Petrol
+Mercruiser   350MagMPI           300 Petrol
+Mercury      Mark30               30 Petrol
+Tohatsu      M50CEPTS             50 Petrol
+Rotax        720CC                85 Petrol
+
+
